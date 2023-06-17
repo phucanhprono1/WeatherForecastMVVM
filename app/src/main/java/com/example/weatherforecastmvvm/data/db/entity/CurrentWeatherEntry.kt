@@ -35,23 +35,8 @@ data class CurrentWeatherEntry(
     val visKm: Double,
     @SerializedName("vis_miles")
     val visMiles: Double
-) : UnitSpecificCurrentWeatherEntry {
+) {
     @PrimaryKey(autoGenerate = false)
     var id: Int = CURRENT_WEATHER_ID
-    override val temperature: Double
-        get() = TODO("Not yet implemented")
-    override val conditionText: String
-        get() = TODO("Not yet implemented")
-    override val conditionIconUrl: String
-        get() = TODO("Not yet implemented")
-    override val windSpeed: Double
-        get() = TODO("Not yet implemented")
-    override val windDirection: String
-        get() = TODO("Not yet implemented")
-    override val precipitationVolume: Double
-        get() = TODO("Not yet implemented")
-    override val feelsLikeTemperature: Double
-        get() = TODO("Not yet implemented")
-    override val visibilityDistance: Double
-        get() = TODO("Not yet implemented")
+
 }

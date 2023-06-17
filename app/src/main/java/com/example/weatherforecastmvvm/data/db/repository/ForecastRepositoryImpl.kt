@@ -19,10 +19,8 @@ class ForecastRepositoryImpl (
     private val currentWeather = MutableLiveData<UnitSpecificCurrentWeatherEntry>()
     init {
         weatherNetworkDataSource.apply {
-            downloadedCurrentWeather.observeForever{newCurrentWeather ->
-                // persist
-                currentWeather.value = newCurrentWeather.currentWeatherEntry
-                persistFetchedCurrentWeather(newCurrentWeather)
+            downloadedCurrentWeather.observeForever{
+                persistFetchedCurrentWeather(it)
             }
         }
     }
@@ -39,14 +37,14 @@ class ForecastRepositoryImpl (
         }
     }
     private suspend fun initWeatherData(){
-        if (isFetchCurrentNeeded(ZonedDateTime.now().minusHours(0)))
+        if (isFetchCurrentNeeded(ZonedDateTime.now().minusHours(1)))
             fetchCurrentWeather()
     }
     private suspend fun fetchCurrentWeather(){
         weatherNetworkDataSource.fetchCurrentWeather("Hanoi","vi")
     }
     private fun isFetchCurrentNeeded(lastFetchedTime: ZonedDateTime): Boolean{
-        val thirtyMinutesAgo = ZonedDateTime.now().minusMinutes(0)
+        val thirtyMinutesAgo = ZonedDateTime.now().minusMinutes(30)
         return lastFetchedTime.isBefore(thirtyMinutesAgo)
 
     }

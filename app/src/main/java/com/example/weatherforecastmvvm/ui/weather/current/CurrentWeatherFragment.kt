@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import com.example.weatherforecastmvvm.data.WeatherApiService
+import com.example.weatherforecastmvvm.data.db.entity.CurrentWeatherEntry
 import com.example.weatherforecastmvvm.data.network.ConnectivityInterceptorImpl
 import com.example.weatherforecastmvvm.data.network.WeatherNetworkDataSourceImpl
 import com.example.weatherforecastmvvm.databinding.FragmentCurrentWeatherBinding
@@ -47,7 +48,8 @@ class CurrentWeatherFragment : ScopedFragment(),KodeinAware{
 
     }
     private fun bindUI() = launch{
-        val currentWeather = viewModel.weather
+        val currentWeather = viewModel.weather.await()
+
         currentWeather.observe(viewLifecycleOwner) {it->
             if (it == null) return@observe
             binding.groupLoading.visibility = View.GONE
