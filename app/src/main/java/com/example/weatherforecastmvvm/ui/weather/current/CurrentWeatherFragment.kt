@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.example.weatherforecastmvvm.data.WeatherApiService
 import com.example.weatherforecastmvvm.data.db.entity.CurrentWeatherEntry
@@ -52,7 +53,7 @@ class CurrentWeatherFragment : ScopedFragment(),KodeinAware{
         }
 
     }
-    private fun bindU1() = launch{
+    private fun bindU1() = viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main){
         val currentWeather = viewModel.weather.await()
         val weatherLocation = viewModel.weatherLocation.await()
         weatherLocation.observe(viewLifecycleOwner) {it->
@@ -75,7 +76,7 @@ class CurrentWeatherFragment : ScopedFragment(),KodeinAware{
         }
         binding.swipeRefresh.isRefreshing = false
     }
-    private fun bindUI() = launch{
+    private fun bindUI() = viewLifecycleOwner.lifecycleScope.launch{
         val currentWeather = viewModel.weather.await()
         val weatherLocation = viewModel.weatherLocation.await()
         weatherLocation.observe(viewLifecycleOwner) {it->

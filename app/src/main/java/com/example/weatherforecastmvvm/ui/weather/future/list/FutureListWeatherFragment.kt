@@ -2,27 +2,23 @@ package com.example.weatherforecastmvvm.ui.weather.future.list
 
 import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.weatherforecastmvvm.R
-import com.example.weatherforecastmvvm.data.db.unitlocalized.future.UnitSpecificSimpleFutureWeatherEntry
 import com.example.weatherforecastmvvm.databinding.FragmentFutureListWeatherBinding
 import com.example.weatherforecastmvvm.internal.LocalDateConverter
 import com.example.weatherforecastmvvm.ui.base.ScopedFragment
 import kotlinx.coroutines.launch
-import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.instance
-import org.threeten.bp.LocalDate
 
 
-class FutureListWeatherFragment : ScopedFragment(),KodeinAware ,FutureWeatherItem.ItemClickListener{
+class FutureListWeatherFragment : ScopedFragment(),KodeinAware {
     override val kodein by closestKodein()
     private val viewModelFactory : FutureListWeatherViewModelFactory by instance()
     companion object {
@@ -46,7 +42,7 @@ class FutureListWeatherFragment : ScopedFragment(),KodeinAware ,FutureWeatherIte
         // TODO: Use the ViewModel
         bindUI()
     }
-    private fun bindUI() = launch{
+    private fun bindUI() = viewLifecycleOwner.lifecycleScope.launch{
         val futureWeatherEntries = viewModel.weatherEntries.await()
         val weatherLocation = viewModel.weatherLocation.await()
         weatherLocation.observe(viewLifecycleOwner) {it->
@@ -57,11 +53,20 @@ class FutureListWeatherFragment : ScopedFragment(),KodeinAware ,FutureWeatherIte
             if (it == null) return@observe
             binding.groupLoading.visibility = View.GONE
             updateDateToNextWeek()
-            val futureWeatherItem = FutureWeatherItem(it,this@FutureListWeatherFragment)
+            val futureWeatherItem = FutureWeatherItem(it)
             binding.recyclerView.apply {
                 adapter = futureWeatherItem
                 layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
             }
+            futureWeatherItem.setOnItemClickListener(object: FutureWeatherItem.onItemClickListener{
+                override fun onItemClicked(position: Int) {
+                    val dateString = LocalDateConverter.dateToString(it[position].date)
+
+                    val actionDetail = FutureListWeatherFragmentDirections.actionFutureListWeatherFragmentToFutureDetailWeatherFragment(dateString!!)
+                    Navigation.findNavController(binding.root).navigate(actionDetail)
+                }
+
+            })
 
         }
     }
@@ -73,9 +78,7 @@ class FutureListWeatherFragment : ScopedFragment(),KodeinAware ,FutureWeatherIte
         (activity as? AppCompatActivity)?.supportActionBar?.subtitle = "Next Week"
     }
 
-    override fun onItemClicked(item: UnitSpecificSimpleFutureWeatherEntry) {
 
-    }
 //    private fun showWeatherDetail(date: LocalDate, view: View) {
 //        val dateString = LocalDateConverter.dateToString(date)!!
 //        val actionDetail = FutureListWeatherFragmentDirections.actionDetail(dateString)
