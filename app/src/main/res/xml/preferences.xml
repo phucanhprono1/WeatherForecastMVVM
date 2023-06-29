@@ -9,7 +9,7 @@
             android:defaultValue="true"
             android:disableDependentsState="true"/>
         <EditTextPreference
-            android:key="custom_location"
+            android:key="CUSTOM_LOCATION"
             android:title="Custom location"
             android:summary="Enter a custom location"
             android:dialogTitle="Enter a custom location"

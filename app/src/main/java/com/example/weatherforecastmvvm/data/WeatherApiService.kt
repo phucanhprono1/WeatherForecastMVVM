@@ -2,6 +2,7 @@ package com.example.weatherforecastmvvm.data
 
 import com.example.weatherforecastmvvm.data.network.ConnectivityInterceptor
 import com.example.weatherforecastmvvm.data.network.response.CurrentWeatherResponse
+import com.example.weatherforecastmvvm.data.network.response.FutureWeatherResponse
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import kotlinx.coroutines.Deferred
 import okhttp3.Interceptor
@@ -21,6 +22,15 @@ interface WeatherApiService {
         @Query("q") location: String,
         @Query("lang") languageCode: String = "vi"
     ): Deferred<CurrentWeatherResponse>
+
+    @GET("forecast.json")
+    fun getFutureWeather(
+        @Query("q") location: String,
+        @Query("days") days: Int,
+        @Query("lang") languageCode: String = "vi"
+    ): Deferred<FutureWeatherResponse>
+
+
     companion object{
         operator fun invoke(
             connectivityInterceptor: ConnectivityInterceptor
@@ -50,4 +60,5 @@ interface WeatherApiService {
                 .create(WeatherApiService::class.java)
         }
     }
+
 }

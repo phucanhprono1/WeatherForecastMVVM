@@ -10,8 +10,8 @@ import kotlin.coroutines.CoroutineContext
 abstract class ScopedFragment:Fragment(), CoroutineScope {
     private lateinit var job: Job
     override fun onDestroy() {
-        job.cancel()
         super.onDestroy()
+        job.cancel()
     }
     override val coroutineContext: CoroutineContext
         get() = job + Dispatchers.Main

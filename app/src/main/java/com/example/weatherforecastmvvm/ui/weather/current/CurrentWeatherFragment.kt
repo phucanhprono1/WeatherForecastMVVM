@@ -2,6 +2,7 @@ package com.example.weatherforecastmvvm.ui.weather.current
 
 import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -45,15 +46,46 @@ class CurrentWeatherFragment : ScopedFragment(),KodeinAware{
         super.onActivityCreated(savedInstanceState)
         viewModel = ViewModelProvider(this,viewModelFactory).get(CurrentWeatherViewModel::class.java)
         bindUI()
+        binding.swipeRefresh.setOnRefreshListener {
+            bindU1()
 
+        }
+
+    }
+    private fun bindU1() = launch{
+        val currentWeather = viewModel.weather.await()
+        val weatherLocation = viewModel.weatherLocation.await()
+        weatherLocation.observe(viewLifecycleOwner) {it->
+            if (it == null) return@observe
+            updateLocation(it.name)
+        }
+        currentWeather.observe(viewLifecycleOwner) {it->
+            Log.d("CurrentWeatherFragment", "bindUI: ${it.temperature} ${it.feelsLikeTemperature} ${it.toString()}")
+            if (it == null) return@observe
+            binding.groupLoading.visibility = View.GONE
+            updateDateToToday()
+            updateTemperature(it.temperature, it.feelsLikeTemperature)
+            updateCondition(it.conditionText)
+            updatePrecipitation(it.precipitationVolume)
+            updateWind(it.windDirection, it.windSpeed)
+            updateVisibility(it.visibilityDistance)
+            Glide.with(this@CurrentWeatherFragment)
+                .load("http:${it.conditionIconUrl}")
+                .into(binding.imageViewConditionIcon)
+        }
+        binding.swipeRefresh.isRefreshing = false
     }
     private fun bindUI() = launch{
         val currentWeather = viewModel.weather.await()
-
+        val weatherLocation = viewModel.weatherLocation.await()
+        weatherLocation.observe(viewLifecycleOwner) {it->
+            if (it == null) return@observe
+            updateLocation(it.name)
+        }
         currentWeather.observe(viewLifecycleOwner) {it->
+            Log.d("CurrentWeatherFragment", "bindUI: ${it.temperature} ${it.feelsLikeTemperature} ${it.toString()}")
             if (it == null) return@observe
             binding.groupLoading.visibility = View.GONE
-            updateLocation("Hanoi")
             updateDateToToday()
             updateTemperature(it.temperature, it.feelsLikeTemperature)
             updateCondition(it.conditionText)
@@ -78,7 +110,7 @@ class CurrentWeatherFragment : ScopedFragment(),KodeinAware{
 
     }
     private fun chooseLocalizedUnitAbbreviation(metric: String, imperial: String): String{
-        return if (viewModel.isMetric) metric else imperial
+        return if (viewModel.isMetricUnit) metric else imperial
     }
     private fun updateCondition(condition: String){
         binding.textViewCondition.text = condition

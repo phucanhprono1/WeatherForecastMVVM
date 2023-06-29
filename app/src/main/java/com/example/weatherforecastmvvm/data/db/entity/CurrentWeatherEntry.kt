@@ -3,7 +3,6 @@ package com.example.weatherforecastmvvm.data.db.entity
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.example.weatherforecastmvvm.data.db.unitlocalized.UnitSpecificCurrentWeatherEntry
 import com.google.gson.annotations.SerializedName
 
 const val CURRENT_WEATHER_ID = 0
